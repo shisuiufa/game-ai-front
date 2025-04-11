@@ -1,4 +1,3 @@
-import type { ResourceItem } from '~/types/api-resource';
 import {defineStore} from "pinia";
 import {useNotifications} from "~/composables/useNotifications";
 
@@ -6,9 +5,17 @@ export const useProfileStore = defineStore(
     'profile',
     () => {
         const user = useCurrentUser();
-        const { notifyError } = useNotifications();
+        const {notifyError} = useNotifications();
 
         const loading = ref(false);
+
+        const refreshToken = async () => {
+            try {
+                await useLaravel('/api/v1/refresh_token', {method: 'GET'});
+            } catch (e) {
+                console.log(e)
+            }
+        }
 
         const register = async (data): Promise<void> => {
             try {
@@ -21,9 +28,9 @@ export const useProfileStore = defineStore(
                     body: data,
                 });
 
-                user.value = response.data;
-            } catch (e){
-                notifyError({ description: e.message });
+                user.value = response.data.user;
+            } catch (e) {
+                notifyError({description: e.message});
             } finally {
                 loading.value = false;
             }
@@ -40,9 +47,9 @@ export const useProfileStore = defineStore(
                     body: credentials,
                 });
 
-                user.value = response.data;
+                user.value = response.data.user;
             } catch (e) {
-                notifyError({ description: e.message });
+                notifyError({description: e.message});
             } finally {
                 loading.value = false;
             }
@@ -53,7 +60,7 @@ export const useProfileStore = defineStore(
                 return;
             }
 
-            await useLaravel('/api/auth/logout', { method: 'POST' }).finally(() => {
+            await useLaravel('/api/auth/logout', {method: 'POST'}).finally(() => {
                 user.value = null;
                 reloadNuxtApp();
             });
@@ -65,7 +72,8 @@ export const useProfileStore = defineStore(
             register,
             login,
             logout,
+            refreshToken,
         };
     },
-    { persist: true }
+    {persist: true}
 );

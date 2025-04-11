@@ -31,7 +31,7 @@ const toggleForm = () => {
     <LoginForm v-if="selectedForm === 'login'" class="mt-10"/>
     <RegisterForm v-else class="mt-10"/>
 
-    <AppButton class="mt-2" @click="toggleForm">
+    <AppButton class="mt-2 w-full" @click="toggleForm">
       {{ selectedForm === 'login' ? "Don't have an account?" : "Already have an account? Sign in" }}
     </AppButton>
   </UContainer>

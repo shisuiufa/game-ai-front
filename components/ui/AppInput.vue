@@ -4,8 +4,11 @@
 
 <template>
   <UInput
-      :ui="{ icon: { trailing: { pointer: '' } } }"
-      class="block w-full rounded-md bg-white text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+      :ui="{
+        wrapper: 'relative h-full',
+        base: 'relative block w-full h-full disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0',
+        icon: { trailing: { pointer: '' } }
+      }">
     <template v-if="$slots.trailing" #trailing>
       <slot name="trailing"/>
     </template>

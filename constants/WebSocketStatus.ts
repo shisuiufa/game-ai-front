@@ -4,6 +4,8 @@ export enum WebSocketStatus {
     CONNECTED = "connected",
     SEARCHING = "searching",
     JOINED = "joined",
-    START = "start",
+    FULL = "full",
+    GAME = "game",
+    OVER = "over",
     ERROR = "error"
 }

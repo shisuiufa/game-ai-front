@@ -54,7 +54,7 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
       </AppInput>
     </UFormGroup>
 
-    <AppButton :disabled="loading" type="submit">
+    <AppButton class="w-full" :disabled="loading" type="submit">
       Sign in
     </AppButton>
   </UForm>
