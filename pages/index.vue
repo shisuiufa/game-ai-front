@@ -5,7 +5,7 @@ import {WsAnswers} from "~/resource/game";
 
 const {$gameWs} = useNuxtApp();
 
-const {task, answers, winner, status, users} = toRefs($gameWs);
+const {task, answers, winner, status, users, opponentTyping} = toRefs($gameWs);
 
 const findGame = () => {
   if ($gameWs.status.value === WebSocketStatus.DISCONNECTED) {
@@ -23,7 +23,6 @@ const findGame = () => {
     $gameWs.findGame();
   }
 };
-
 
 const title = computed(() => {
   switch (status.value) {
@@ -93,6 +92,8 @@ const icon = computed(() => {
           :task="task"
           :answers="answers"
           :winner="winner"
+          :users="users"
+          :opponentTyping="opponentTyping"
           class="h-full"
       />
 

@@ -31,7 +31,7 @@ setTimeout(() => {
     >
       <div v-if="show" class="flex gap-2">
         <div :class="[
-        'flex max-w-96 px-4 rounded-lg py-2 gap-3 shadow min-h-[40px] transition-colors duration-300',
+        'flex px-4 rounded-lg py-2 gap-3 shadow min-h-[40px] transition-colors duration-300',
         isUserAnswer ? 'bg-indigo-500 text-white' : 'bg-white text-gray-800 order-last'
       ]"
         >
@@ -41,18 +41,12 @@ setTimeout(() => {
             Answer hidden until round ends
           </div>
 
-          <p v-else :key="'visible-' + item.userId" class="leading-relaxed">
+          <p v-else :key="'visible-' + item.userId" class="max-w-96 leading-relaxed break-words whitespace-pre-wrap">
             {{ item.answer }}
           </p>
         </div>
 
-        <div class="w-9 h-9 rounded-full flex items-center justify-center">
-          <img
-              src="https://placehold.co/200x/b7a8ff/ffffff.svg?text=ʕ•́ᴥ•̀ʔ&font=Lato"
-              alt="Avatar"
-              class="w-9 h-9 rounded-full"
-          />
-        </div>
+        <UAvatar src="https://placehold.co/200x/b7a8ff/ffffff.svg?text=ʕ•́ᴥ•̀ʔ&font=Lato" size="md" />
       </div>
     </Transition>
   </div>

@@ -10,12 +10,14 @@ export default defineNuxtPlugin(() => {
     let shouldReconnect = true;
     let eventListeners: ((data: any) => void)[] = [];
 
+    const opponentTyping = ref(false);
+
+
     const lobbyUuid: Ref<String | null> = ref(null)
     const wsStatus = ref<WebSocketStatus>(WebSocketStatus.DISCONNECTED);
     const wsUsers = ref([]);
     const wsTask: Ref<TaskResource | null> = ref(null);
     const wsAnswers: Ref<AnswerResource | null> = ref([]);
-    const wsResult = ref();
     const wsWinner = ref(null);
 
     const user: Ref<UserResource | null> = useCurrentUser();
@@ -86,6 +88,15 @@ export default defineNuxtPlugin(() => {
                         clearWs()
                     }
                 }
+
+                if (data.event === WsAnswers.GAME_TYPING) {
+                    const isOpponent = data.userId !== user.value?.id;
+
+                    if (isOpponent && typeof data.isTyping === "boolean") {
+                        opponentTyping.value = data.isTyping;
+                    }
+                }
+
 
                 if (data.lobbyUuid) {
                     lobbyUuid.value = data.lobbyUuid;
@@ -195,7 +206,8 @@ export default defineNuxtPlugin(() => {
                 users: wsUsers,
                 task: wsTask,
                 answers: wsAnswers,
-                winner: wsWinner
+                winner: wsWinner,
+                opponentTyping,
             }
         }
     };
