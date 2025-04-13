@@ -25,13 +25,5 @@ export default defineNuxtConfig({
   },
   colorMode: { preference: 'light' },
   ssr: false,
-  vite: {
-    server: {
-      allowedHosts: [
-        'localhost',
-        '127.0.0.1',
-        '15ef-2a0c-16c0-510-4c7-00-a5b3.ngrok-free.app'
-      ]
-    }
-  }
+
 })
