@@ -3,6 +3,8 @@ import type {AnswerResource, TaskResource} from "~/resource/game";
 import type {Ref} from "vue";
 import type {UserResource} from "~/resource/user";
 import {WsAnswers} from "~/resource/game";
+import type {ResultResource} from "~/resource/result";
+import {useWsPath} from "~/config/entrypoint";
 
 export default defineNuxtPlugin(() => {
     let socket: WebSocket | null = null;
@@ -12,13 +14,15 @@ export default defineNuxtPlugin(() => {
 
     const opponentTyping = ref(false);
 
-
     const lobbyUuid: Ref<String | null> = ref(null)
     const wsStatus = ref<WebSocketStatus>(WebSocketStatus.DISCONNECTED);
     const wsUsers = ref([]);
     const wsTask: Ref<TaskResource | null> = ref(null);
     const wsAnswers: Ref<AnswerResource | null> = ref([]);
     const wsWinner = ref(null);
+    const wsEndAt: number | null = ref(null)
+    const wsNowAt: number | null = ref(null)
+    const wsResult: ResultResource[] | null = ref(null);
 
     const user: Ref<UserResource | null> = useCurrentUser();
     const profileCookie = useCookie('profile') as Ref<{ user: UserResource | null } | undefined>;
@@ -35,6 +39,9 @@ export default defineNuxtPlugin(() => {
     const trackedStatuses = new Set([
         WsAnswers.GAME_SEARCH,
         WsAnswers.GAME_START,
+        WsAnswers.GAME_END,
+        WsAnswers.GAME_GENERATE_TASK,
+        WsAnswers.GAME_GENERATE_RESULT,
     ])
 
     const clearWs = () => {
@@ -43,13 +50,14 @@ export default defineNuxtPlugin(() => {
         wsAnswers.value = [];
         wsTask.value = null;
         wsWinner.value = null;
+        wsResult.value = null;
     }
 
     const connect = () => {
         console.log("🔌 Подключение к WebSocket...");
         const accessToken = useCookie("accessToken");
 
-        const wsUrl = `ws://localhost:3001?token=${encodeURIComponent(accessToken.value || "")}`;
+        const wsUrl = `${useWsPath()}?token=${encodeURIComponent(accessToken.value || "")}`;
 
         wsStatus.value = WebSocketStatus.CONNECTING;
         socket = new WebSocket(wsUrl);
@@ -81,10 +89,9 @@ export default defineNuxtPlugin(() => {
 
                 if (data.status != null && isValidWsAnswer(data.status)) {
                     if(trackedStatuses.has(data.status)){
-                        console.log(data.status)
                         wsStatus.value = data.status;
                     }
-                    if(wsStatus.value == WsAnswers.GAME_END || wsStatus.value == WsAnswers.GAME_SEARCH) {
+                    if(wsStatus.value == WsAnswers.GAME_SEARCH) {
                         clearWs()
                     }
                 }
@@ -97,6 +104,13 @@ export default defineNuxtPlugin(() => {
                     }
                 }
 
+                if (data.endAt) {
+                    wsEndAt.value = data.endAt;
+                }
+
+                if (data.nowAt) {
+                    wsNowAt.value = data.nowAt;
+                }
 
                 if (data.lobbyUuid) {
                     lobbyUuid.value = data.lobbyUuid;
@@ -116,6 +130,10 @@ export default defineNuxtPlugin(() => {
 
                 if(data.winner){
                     wsWinner.value = data.winner;
+                }
+
+                if(data.result){
+                    wsResult.value = data.result;
                 }
 
                 if(data.event == WsAnswers.GAME_USER_JOINED && data.newPlayer){
@@ -207,7 +225,10 @@ export default defineNuxtPlugin(() => {
                 task: wsTask,
                 answers: wsAnswers,
                 winner: wsWinner,
+                endAt: wsEndAt,
+                nowAt: wsNowAt,
                 opponentTyping,
+                result: wsResult,
             }
         }
     };

@@ -11,6 +11,9 @@ export enum WsAnswers {
   GAME_JOINED = 7,
   GAME_NEW_ANSWER = 8,
   GAME_TYPING = 9,
+  GAME_TIMER_EXTENDED = 10,
+  GAME_GENERATE_TASK = 11,
+  GAME_GENERATE_RESULT = 12,
 }
 
 export const taskSchema = resourceSchema.extend({

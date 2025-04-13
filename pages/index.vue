@@ -2,10 +2,11 @@
 import AppButton from "~/components/ui/AppButton.vue";
 import {WebSocketStatus} from "~/constants/WebSocketStatus";
 import {WsAnswers} from "~/resource/game";
+import CountdownTimer from "~/components/ui/CountdownTimer.vue";
 
 const {$gameWs} = useNuxtApp();
 
-const {task, answers, winner, status, users, opponentTyping} = toRefs($gameWs);
+const {task, answers, winner, status, users, opponentTyping, endAt, nowAt, result} = toRefs($gameWs);
 
 const findGame = () => {
   if ($gameWs.status.value === WebSocketStatus.DISCONNECTED) {
@@ -70,14 +71,17 @@ const icon = computed(() => {
             <Icon :name="icon" class="w-5 h-5" />
             <span>{{title}}</span>
           </div>
-          <AppButton
-              v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_START || status === WsAnswers.GAME_END"
-              @click="$gameWs.leaveGame()"
-              icon="i-heroicons-arrow-left-on-rectangle"
-              color="red"
-          >
-            Exit
-          </AppButton>
+          <div class="flex gap-2">
+            <CountdownTimer v-if="nowAt && endAt && status == WsAnswers.GAME_START" :endAt="endAt" :nowAt="nowAt" />
+            <AppButton
+                v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_START || status === WsAnswers.GAME_END"
+                @click="$gameWs.leaveGame()"
+                icon="i-heroicons-arrow-left-on-rectangle"
+                color="red"
+            >
+              Exit
+            </AppButton>
+          </div>
         </div>
       </template>
 
@@ -88,11 +92,13 @@ const icon = computed(() => {
       />
 
       <GameView
-          v-if="status === WsAnswers.GAME_START"
+          v-if="status === WsAnswers.GAME_START || status === WsAnswers.GAME_END || status === WsAnswers.GAME_GENERATE_TASK || status === WsAnswers.GAME_GENERATE_RESULT"
           :task="task"
           :answers="answers"
           :winner="winner"
           :users="users"
+          :status="status"
+          :result="result"
           :opponentTyping="opponentTyping"
           class="h-full"
       />

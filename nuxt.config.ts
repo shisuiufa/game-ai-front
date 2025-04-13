@@ -16,13 +16,22 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiPath: process.env.API_PATH,
+      wsPath:  process.env.WS_PATH
     },
   },
-
   tailwindcss: {
     configPath: '@/tailwind.config.ts',
     viewer: false,
   },
   colorMode: { preference: 'light' },
   ssr: false,
+  vite: {
+    server: {
+      allowedHosts: [
+        'localhost',
+        '127.0.0.1',
+        '15ef-2a0c-16c0-510-4c7-00-a5b3.ngrok-free.app'
+      ]
+    }
+  }
 })

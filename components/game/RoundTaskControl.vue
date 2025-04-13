@@ -38,7 +38,7 @@ const onInput = () => {
   if (typingTimeout) clearTimeout(typingTimeout);
   typingTimeout = setTimeout(() => {
     $gameWs.typing(false);
-  }, 1000);
+  }, 500);
 };
 </script>
 

@@ -1,11 +1,6 @@
 import { z } from 'zod';
 import { resourceSchema } from './resource';
 
-export enum UserRole {
-  User = 'user',
-  Admin = 'admin',
-}
-
 export enum UserStatus {
   Search = 'search',
   Ready = 'ready',
