@@ -39,7 +39,7 @@ setTimeout(() => (show.value = true), 150)
             class="mt-3 py-1.5 text-center"
         >
           <p class="w-full">
-            🔍 Попробовать ещё раз
+            Try again 🔍
           </p>
         </UButton>
       </div>

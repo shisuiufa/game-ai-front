@@ -178,7 +178,7 @@ export default defineNuxtPlugin(() => {
                     wsAnswers.value.push(data.answer)
                 }
 
-                if (data.message) {
+                if (data.event == WsAnswers.GAME_ERROR && data.message) {
                     wsMessage.value = data.message;
                 }
 
