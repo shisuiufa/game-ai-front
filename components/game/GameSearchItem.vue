@@ -4,9 +4,9 @@ import { UserStatus, type WsUserResource } from "~/resource/user";
 const props = defineProps<{ item: WsUserResource }>();
 
 const statusLabel = computed(() => {
-  if (props.item.status === UserStatus.Ready) return "Готов";
-  if (props.item.status === UserStatus.Search) return "В поиске";
-  return "Неизвестно";
+  if (props.item.status === UserStatus.Ready) return "Ready";
+  if (props.item.status === UserStatus.Search) return "Searching";
+  return "Unknown";
 });
 
 const statusColor = computed(() => {
@@ -23,7 +23,7 @@ const statusColor = computed(() => {
     </div>
 
     <div class="text-2xl font-semibold text-gray-800 text-center">
-      {{ item.username ?? "Игрок" }}
+      {{ item.username ?? "Player" }}
     </div>
 
     <div :class="['text-xl font-medium', statusColor]">
