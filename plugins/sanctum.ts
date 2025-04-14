@@ -1,8 +1,6 @@
 import { ofetch } from 'ofetch';
 import { useApiPath } from '~/config/entrypoint';
 import LaravelError from '~/utils/laravel-error';
-import type {UserResource} from "~/resource/user";
-import type {Ref} from "vue";
 import {useToken} from "~/composables/useToken";
 
 enum ApiError {

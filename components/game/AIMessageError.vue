@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import {WebSocketStatus} from "~/constants/WebSocketStatus";
-
 defineProps<{
   message: string
 }>()
