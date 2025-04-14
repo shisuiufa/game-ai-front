@@ -6,23 +6,10 @@ import CountdownTimer from "~/components/ui/CountdownTimer.vue";
 
 const {$gameWs} = useNuxtApp();
 
-const {task, answers, winner, status, users, opponentTyping, endAt, nowAt, result} = toRefs($gameWs);
+const {task, answers, winner, status, users, opponentTyping, endAt, nowAt, result, message} = toRefs($gameWs);
 
 const findGame = () => {
-  if ($gameWs.status.value === WebSocketStatus.DISCONNECTED) {
-    $gameWs.connect();
-
-    const waitForConnect = () => {
-      if ($gameWs.status.value === WebSocketStatus.CONNECTED) {
-        $gameWs.findGame();
-        clearInterval(interval);
-      }
-    };
-
-    const interval = setInterval(waitForConnect, 50);
-  } else {
-    $gameWs.findGame();
-  }
+  $gameWs.ensureConnectedAndFindGame();
 };
 
 const title = computed(() => {
@@ -68,11 +55,11 @@ const icon = computed(() => {
       <template #header>
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
-            <Icon :name="icon" class="w-5 h-5" />
-            <span>{{title}}</span>
+            <Icon :name="icon" class="w-5 h-5"/>
+            <span>{{ title }}</span>
           </div>
           <div class="flex gap-2">
-            <CountdownTimer v-if="nowAt && endAt && status == WsAnswers.GAME_START" :endAt="endAt" :nowAt="nowAt" />
+            <CountdownTimer v-if="nowAt && endAt && status == WsAnswers.GAME_START" :endAt="endAt" :nowAt="nowAt"/>
             <AppButton
                 v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_START || status === WsAnswers.GAME_END"
                 @click="$gameWs.leaveGame()"
@@ -92,7 +79,13 @@ const icon = computed(() => {
       />
 
       <GameView
-          v-if="status === WsAnswers.GAME_START || status === WsAnswers.GAME_END || status === WsAnswers.GAME_GENERATE_TASK || status === WsAnswers.GAME_GENERATE_RESULT"
+          v-if="
+          status === WsAnswers.GAME_START ||
+          status === WsAnswers.GAME_END ||
+          status === WsAnswers.GAME_GENERATE_TASK ||
+          status === WsAnswers.GAME_JOINED ||
+          status === WsAnswers.GAME_GENERATE_RESULT ||
+          status === WsAnswers.GAME_ERROR"
           :task="task"
           :answers="answers"
           :winner="winner"
@@ -100,6 +93,7 @@ const icon = computed(() => {
           :status="status"
           :result="result"
           :opponentTyping="opponentTyping"
+          :message="message"
           class="h-full"
       />
 
@@ -113,7 +107,7 @@ const icon = computed(() => {
             Find game
           </AppButton>
 
-          <GameRoundTaskControl class="w-full" v-if="status === WsAnswers.GAME_START" />
+          <GameRoundTaskControl class="w-full" v-if="status === WsAnswers.GAME_START"/>
         </div>
       </template>
     </UCard>

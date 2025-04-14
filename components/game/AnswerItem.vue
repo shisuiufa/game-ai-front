@@ -7,10 +7,10 @@ const props = defineProps<{
 
 const show = ref(false);
 
-const currentUser = useCurrentUser();
+const {user} = useCurrentUser();
 
 const isUserAnswer = computed(() => {
-  return props.item.userId == currentUser.value.id;
+  return props.item.userId == user.value.id;
 });
 
 setTimeout(() => {

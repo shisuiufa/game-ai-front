@@ -5,7 +5,7 @@ import {z} from 'zod';
 
 const {$gameWs} = useNuxtApp();
 
-const currentUser = useCurrentUser();
+const {user} = useCurrentUser();
 
 const schema = z.object({
   answer: z.string().min(2, 'Must be at least 1 characters'),
@@ -18,7 +18,7 @@ const form = ref<Form<Schema>>();
 const state = ref<Partial<Schema>>({});
 
 const haveAnswer = computed(() => {
-  return $gameWs.answers?.value.some(item => item.userId == currentUser.value.id) || false;
+  return $gameWs.answers?.value.some(item => item.userId == user.value.id) || false;
 });
 
 

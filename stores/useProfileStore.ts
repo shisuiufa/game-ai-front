@@ -4,7 +4,7 @@ import {useNotifications} from "~/composables/useNotifications";
 export const useProfileStore = defineStore(
     'profile',
     () => {
-        const user = useCurrentUser();
+        const {user, set, clear} = useCurrentUser();
         const {notifyError} = useNotifications();
 
         const loading = ref(false);
@@ -28,7 +28,7 @@ export const useProfileStore = defineStore(
                     body: data,
                 });
 
-                user.value = response.data.user;
+                set(response.data.user)
             } catch (e) {
                 notifyError({description: e.message});
             } finally {
@@ -38,7 +38,7 @@ export const useProfileStore = defineStore(
 
         const login = async (credentials): Promise<void> => {
             try {
-                if (loading.value || user.value !== null) return;
+                if (loading.value) return;
 
                 loading.value = true;
 
@@ -47,7 +47,7 @@ export const useProfileStore = defineStore(
                     body: credentials,
                 });
 
-                user.value = response.data.user;
+                set(response.data.user)
             } catch (e) {
                 notifyError({description: e.message});
             } finally {
@@ -61,7 +61,7 @@ export const useProfileStore = defineStore(
             }
 
             await useLaravel('/api/auth/logout', {method: 'POST'}).finally(() => {
-                user.value = null;
+                clear();
                 reloadNuxtApp();
             });
         };

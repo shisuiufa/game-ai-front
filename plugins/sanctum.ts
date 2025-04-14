@@ -2,6 +2,8 @@ import { ofetch } from 'ofetch';
 import { useApiPath } from '~/config/entrypoint';
 import LaravelError from '~/utils/laravel-error';
 import type {UserResource} from "~/resource/user";
+import type {Ref} from "vue";
+import {useToken} from "~/composables/useToken";
 
 enum ApiError {
   BadRequest = 400,
@@ -13,9 +15,8 @@ enum ApiError {
 }
 
 export default defineNuxtPlugin(async () => {
-  const user: Ref<UserResource | null> = useCurrentUser();
-  const profileCookie = useCookie('profile') as Ref<{ user: UserResource | null } | undefined>;
-  const accessToken = useCookie("accessToken");
+  const {clear} = useCurrentUser();
+  const {token, clear: clearToken, set: setToken} = useToken();
 
   const sanctum = ofetch.create({
     baseURL: useApiPath(),
@@ -23,17 +24,16 @@ export default defineNuxtPlugin(async () => {
       Accept: 'application/json',
     },
     onRequest: async ({ options }) => {
-      if (accessToken.value) {
+      if (token.value) {
         options.headers = {
           ...options.headers,
-          Authorization: `Bearer ${accessToken.value}`,
+          Authorization: `Bearer ${token.value}`,
         };
       }
     },
     onResponse({ response }) {
       if (response._data.data?.accessToken) {
-        accessToken.value = response._data.data.accessToken;
-        console.log(accessToken.value)
+        setToken(response._data.data.accessToken)
       }
     },
     onResponseError: async ({ response }) => {
@@ -53,9 +53,8 @@ export default defineNuxtPlugin(async () => {
       ]);
 
       if (accessErrors.has(response.status)) {
-        user.value = null;
-        profileCookie.value = undefined;
-        accessToken.value = undefined;
+        clear()
+        clearToken()
         await navigateTo('/auth');
       }
       throw createError({
