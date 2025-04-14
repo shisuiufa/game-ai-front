@@ -18,15 +18,19 @@ const sortedResult = computed(() => {
   return [...props.result].sort((a, b) => b.score - a.score);
 });
 
-const maxScore = computed(() => sortedResult.value?.[0].score || 1);
 
 const winnerScore = computed(() =>
-    sortedResult.value ? Math.round((sortedResult.value[0].score / maxScore.value) * 100) : null
+    sortedResult.value
+        ? Number(sortedResult.value[0].score.toFixed(2))
+        : null
 );
 
 const loserScore = computed(() =>
-    sortedResult.value ? Math.round((sortedResult.value[1].score / maxScore.value) * 100) : null
+    sortedResult.value
+        ? Number(sortedResult.value[1].score.toFixed(2))
+        : null
 );
+
 </script>
 
 <template>
