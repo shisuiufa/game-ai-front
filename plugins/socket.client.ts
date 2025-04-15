@@ -15,7 +15,7 @@ export default defineNuxtPlugin(() => {
     const opponentTyping = ref(false);
 
     const lobbyUuid: Ref<String | null> = ref(null)
-    const wsStatus = ref<WebSocketStatus>(WebSocketStatus.CONNECTING);
+    const wsStatus = ref<WebSocketStatus>(WebSocketStatus.DISCONNECTED);
     const wsUsers = ref([]);
     const wsTask: Ref<TaskResource | null> = ref(null);
     const wsAnswers: Ref<AnswerResource | null> = ref([]);
@@ -46,6 +46,10 @@ export default defineNuxtPlugin(() => {
         wsTask.value = null;
         wsWinner.value = null;
         wsResult.value = null;
+        wsEndAt.value = null;
+        wsNowAt.value = null;
+        wsMessage.value = null;
+        eventListeners = [];
     }
     const isValidWsAnswer = (value: any): value is WsAnswers => {
         const num = Number(value);
@@ -250,7 +254,7 @@ export default defineNuxtPlugin(() => {
                             return;
                         }
                         wsAnswers.value.push({userId: user.value.id, answer: answer})
-                        socket.send(JSON.stringify({type: "answer", lobbyUuid, answer}));
+                        socket.send(JSON.stringify({type: "answer", lobbyUuid: lobbyUuid.value, answer}));
                     } else {
                         console.warn("⚠️ WebSocket не подключен, ответ не отправлен");
                     }

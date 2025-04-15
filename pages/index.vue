@@ -41,8 +41,46 @@ const icon = computed(() => {
   }
 });
 
+const isInitializing = ref(true);
+
+const showConnecting = computed(() =>
+    isInitializing.value || status.value === WebSocketStatus.CONNECTING
+);
+
+const showSetup = computed(() =>
+    status.value === WebSocketStatus.DISCONNECTED
+);
+
+const showExitButton = computed(() =>
+    [WsAnswers.GAME_SEARCH, WsAnswers.GAME_START, WsAnswers.GAME_END].includes(status.value)
+);
+
+const showGameSearch = computed(() =>
+    [WsAnswers.GAME_SEARCH, WsAnswers.GAME_READY, WsAnswers.GAME_USER_JOINED].includes(status.value)
+);
+
+const showGameView = computed(() =>
+    [
+      WsAnswers.GAME_START,
+      WsAnswers.GAME_END,
+      WsAnswers.GAME_GENERATE_TASK,
+      WsAnswers.GAME_JOINED,
+      WsAnswers.GAME_GENERATE_RESULT,
+      WsAnswers.GAME_ERROR,
+    ].includes(status.value)
+);
+
+const showTaskControl = computed(() =>
+    status.value === WsAnswers.GAME_START
+);
+
+const showCountdown = computed(() =>
+    nowAt.value && endAt.value && status.value === WsAnswers.GAME_START
+);
+
 onMounted(() => {
   $gameWs.restoreLobby();
+  isInitializing.value = false;
 });
 </script>
 
@@ -50,12 +88,12 @@ onMounted(() => {
   <div class="w-full h-full p-4">
     <GameLobbyConnecting
         class="w-full h-full"
-        v-if="status === WebSocketStatus.CONNECTING"
+        v-if="showConnecting"
     />
 
     <div v-else class="h-full w-full">
       <GameLobbySetup
-          v-if="status === WebSocketStatus.DISCONNECTED"
+          v-if="showSetup"
           class="h-full"
           @start="findGame"
       />
@@ -74,9 +112,9 @@ onMounted(() => {
               <span>{{ title }}</span>
             </div>
             <div class="flex gap-2">
-              <CountdownTimer v-if="nowAt && endAt && status == WsAnswers.GAME_START" :endAt="endAt" :nowAt="nowAt"/>
+              <CountdownTimer v-if="showCountdown" :endAt="endAt" :nowAt="nowAt"/>
               <AppButton
-                  v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_START || status === WsAnswers.GAME_END"
+                  v-if="showExitButton"
                   @click="$gameWs.leaveGame()"
                   icon="i-heroicons-arrow-left-on-rectangle"
                   color="red"
@@ -88,19 +126,13 @@ onMounted(() => {
         </template>
 
         <GameSearch
-            v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_READY || status === WsAnswers.GAME_USER_JOINED"
+            v-if="showGameSearch"
             :users="users"
             class="h-full"
         />
 
         <GameView
-            v-if="
-          status === WsAnswers.GAME_START ||
-          status === WsAnswers.GAME_END ||
-          status === WsAnswers.GAME_GENERATE_TASK ||
-          status === WsAnswers.GAME_JOINED ||
-          status === WsAnswers.GAME_GENERATE_RESULT ||
-          status === WsAnswers.GAME_ERROR"
+            v-if="showGameView"
             :task="task"
             :answers="answers"
             :winner="winner"
@@ -114,7 +146,7 @@ onMounted(() => {
 
         <template #footer>
           <div class="flex items-center justify-between bg-white">
-            <GameRoundTaskControl class="w-full" v-if="status === WsAnswers.GAME_START"/>
+            <GameRoundTaskControl class="w-full" v-if="showTaskControl"/>
           </div>
         </template>
       </UCard>
