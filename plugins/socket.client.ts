@@ -27,7 +27,6 @@ export default defineNuxtPlugin(() => {
 
     const {user, clear} = useCurrentUser()
     const profileStore = useProfileStore();
-
     const trackedStatuses = new Set([
         WsAnswers.GAME_SEARCH,
         WsAnswers.GAME_START,
@@ -39,6 +38,7 @@ export default defineNuxtPlugin(() => {
         WsAnswers.GAME_READY,
         WsAnswers.GAME_USER_JOINED,
     ])
+
     const clearWs = () => {
         lobbyUuid.value = null;
         wsUsers.value = [];
@@ -90,6 +90,20 @@ export default defineNuxtPlugin(() => {
         }
     }
 
+    const restoreLobby = async () => {
+        await connect();
+
+        const interval = setInterval(() => {
+            if (wsStatus.value === WebSocketStatus.CONNECTED) {
+                clearInterval(interval);
+
+                socket?.send(JSON.stringify({
+                    type: 'reconnectToLobby',
+                }));
+            }
+        }, 100);
+    }
+
     const connect = () => {
         console.log("🔌 Подключение к WebSocket...");
         const {token, clear: clearToken} = useToken();
@@ -119,6 +133,7 @@ export default defineNuxtPlugin(() => {
                     clear();
                     clearToken();
                     wsStatus.value = WebSocketStatus.DISCONNECTED;
+                    socket?.close()
                     navigateTo('/auth');
                     return;
                 }
@@ -138,6 +153,13 @@ export default defineNuxtPlugin(() => {
                     if (isOpponent && typeof data.isTyping === "boolean") {
                         opponentTyping.value = data.isTyping;
                     }
+                }
+
+                if (data.status === WsAnswers.GAME_LOBBY_NOT_FOUND){
+                    shouldReconnect = false;
+                    clearWs()
+                    wsStatus.value = WebSocketStatus.DISCONNECTED;
+                    socket?.close()
                 }
 
                 if (data.endAt) {
@@ -221,6 +243,7 @@ export default defineNuxtPlugin(() => {
                 },
                 findGame,
                 ensureConnectedAndFindGame,
+                restoreLobby,
                 sendAnswer: (answer: string) => {
                     if (socket?.readyState === WebSocket.OPEN) {
                         if (wsAnswers.value.find((item) => item.userId == user.value.id)) {

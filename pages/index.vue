@@ -40,22 +40,25 @@ const icon = computed(() => {
       return "i-heroicons-question-mark-circle";
   }
 });
+
+onMounted(() => {
+  $gameWs.restoreLobby();
+});
 </script>
 
 <template>
   <div class="w-full h-full p-4">
-    <GameLobbySetup
-        v-if="status === WebSocketStatus.DISCONNECTED"
-        class="h-full"
-        @start="findGame"
+    <GameLobbyConnecting
+        class="w-full h-full"
+        v-if="status === WebSocketStatus.CONNECTING"
     />
 
     <div v-else class="h-full w-full">
-      <GameLobbyConnecting
-          class="w-full h-full"
-          v-if="status === WebSocketStatus.CONNECTING"
+      <GameLobbySetup
+          v-if="status === WebSocketStatus.DISCONNECTED || status === WebSocketStatus.CONNECTED"
+          class="h-full"
+          @start="findGame"
       />
-
       <UCard v-else
              class="h-full flex flex-col shadow-lg rounded-2xl overflow-hidden"
              :ui="{
