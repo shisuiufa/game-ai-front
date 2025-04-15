@@ -55,7 +55,7 @@ onMounted(() => {
 
     <div v-else class="h-full w-full">
       <GameLobbySetup
-          v-if="status === WebSocketStatus.DISCONNECTED || status === WebSocketStatus.CONNECTED"
+          v-if="status === WebSocketStatus.DISCONNECTED"
           class="h-full"
           @start="findGame"
       />

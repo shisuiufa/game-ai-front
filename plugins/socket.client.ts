@@ -15,7 +15,7 @@ export default defineNuxtPlugin(() => {
     const opponentTyping = ref(false);
 
     const lobbyUuid: Ref<String | null> = ref(null)
-    const wsStatus = ref<WebSocketStatus>(WebSocketStatus.DISCONNECTED);
+    const wsStatus = ref<WebSocketStatus>(WebSocketStatus.CONNECTING);
     const wsUsers = ref([]);
     const wsTask: Ref<TaskResource | null> = ref(null);
     const wsAnswers: Ref<AnswerResource | null> = ref([]);

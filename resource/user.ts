@@ -10,6 +10,7 @@ export enum UserStatus {
 export const userSchema = resourceSchema.extend({
   username: z.string().nullable().optional(),
   email: z.string().email(),
+  points: z.number()
 });
 
 export type UserResource = z.infer<typeof userSchema>;

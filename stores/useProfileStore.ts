@@ -66,6 +66,17 @@ export const useProfileStore = defineStore(
             });
         };
 
+        const fetchProfile = async (): Promise<void> => {
+            try {
+                const res = await useLaravel('/api/v1/profile', {method: 'GET'});
+                if (user.value) {
+                    user.value.points = res.data.points;
+                }
+            } catch (e){
+                console.error(e)
+            }
+        };
+
         return {
             user,
             loading,
@@ -73,6 +84,7 @@ export const useProfileStore = defineStore(
             login,
             logout,
             refreshToken,
+            fetchProfile,
         };
     },
     {persist: true}
