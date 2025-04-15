@@ -35,7 +35,9 @@ export default defineNuxtPlugin(() => {
         WsAnswers.GAME_GENERATE_TASK,
         WsAnswers.GAME_GENERATE_RESULT,
         WsAnswers.GAME_JOINED,
-        WsAnswers.GAME_ERROR
+        WsAnswers.GAME_ERROR,
+        WsAnswers.GAME_READY,
+        WsAnswers.GAME_USER_JOINED,
     ])
     const clearWs = () => {
         lobbyUuid.value = null;
@@ -130,7 +132,7 @@ export default defineNuxtPlugin(() => {
                     }
                 }
 
-                if (data.event === WsAnswers.GAME_TYPING) {
+                if (data.status === WsAnswers.GAME_TYPING) {
                     const isOpponent = data.userId !== user.value?.id;
 
                     if (isOpponent && typeof data.isTyping === "boolean") {
@@ -170,15 +172,15 @@ export default defineNuxtPlugin(() => {
                     wsResult.value = data.result;
                 }
 
-                if (data.event == WsAnswers.GAME_USER_JOINED && data.newPlayer) {
+                if (data.status == WsAnswers.GAME_USER_JOINED && data.newPlayer) {
                     wsUsers.value.push(data.newPlayer)
                 }
 
-                if (data.event == WsAnswers.GAME_NEW_ANSWER && data.answer) {
+                if (data.status == WsAnswers.GAME_NEW_ANSWER && data.answer) {
                     wsAnswers.value.push(data.answer)
                 }
 
-                if (data.event == WsAnswers.GAME_ERROR && data.message) {
+                if (data.status == WsAnswers.GAME_ERROR && data.message) {
                     wsMessage.value = data.message;
                 }
 

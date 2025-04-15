@@ -73,7 +73,7 @@ const icon = computed(() => {
       </template>
 
       <GameSearch
-          v-if="status === WsAnswers.GAME_SEARCH"
+          v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_READY || status === WsAnswers.GAME_USER_JOINED"
           :users="users"
           class="h-full"
       />
