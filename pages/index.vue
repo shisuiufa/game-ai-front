@@ -44,73 +44,78 @@ const icon = computed(() => {
 
 <template>
   <div class="w-full h-full p-4">
-    <UCard
-        class="h-full flex flex-col shadow-lg rounded-2xl overflow-hidden"
-        :ui="{
+    <GameLobbySetup
+        v-if="status === WebSocketStatus.DISCONNECTED"
+        class="h-full"
+        @start="findGame"
+    />
+
+    <div v-else class="h-full w-full">
+      <GameLobbyConnecting
+          class="w-full h-full"
+          v-if="status === WebSocketStatus.CONNECTING"
+      />
+
+      <UCard v-else
+             class="h-full flex flex-col shadow-lg rounded-2xl overflow-hidden"
+             :ui="{
         body: {
           base: 'flex flex-col grow overflow-y-auto p-6 bg-gray-50'
         }
       }"
-    >
-      <template #header>
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
-            <Icon :name="icon" class="w-5 h-5"/>
-            <span>{{ title }}</span>
+      >
+        <template #header>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+              <Icon :name="icon" class="w-5 h-5"/>
+              <span>{{ title }}</span>
+            </div>
+            <div class="flex gap-2">
+              <CountdownTimer v-if="nowAt && endAt && status == WsAnswers.GAME_START" :endAt="endAt" :nowAt="nowAt"/>
+              <AppButton
+                  v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_START || status === WsAnswers.GAME_END"
+                  @click="$gameWs.leaveGame()"
+                  icon="i-heroicons-arrow-left-on-rectangle"
+                  color="red"
+              >
+                Exit
+              </AppButton>
+            </div>
           </div>
-          <div class="flex gap-2">
-            <CountdownTimer v-if="nowAt && endAt && status == WsAnswers.GAME_START" :endAt="endAt" :nowAt="nowAt"/>
-            <AppButton
-                v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_START || status === WsAnswers.GAME_END"
-                @click="$gameWs.leaveGame()"
-                icon="i-heroicons-arrow-left-on-rectangle"
-                color="red"
-            >
-              Exit
-            </AppButton>
-          </div>
-        </div>
-      </template>
+        </template>
 
-      <GameSearch
-          v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_READY || status === WsAnswers.GAME_USER_JOINED"
-          :users="users"
-          class="h-full"
-      />
+        <GameSearch
+            v-if="status === WsAnswers.GAME_SEARCH || status === WsAnswers.GAME_READY || status === WsAnswers.GAME_USER_JOINED"
+            :users="users"
+            class="h-full"
+        />
 
-      <GameView
-          v-if="
+        <GameView
+            v-if="
           status === WsAnswers.GAME_START ||
           status === WsAnswers.GAME_END ||
           status === WsAnswers.GAME_GENERATE_TASK ||
           status === WsAnswers.GAME_JOINED ||
           status === WsAnswers.GAME_GENERATE_RESULT ||
           status === WsAnswers.GAME_ERROR"
-          :task="task"
-          :answers="answers"
-          :winner="winner"
-          :users="users"
-          :status="status"
-          :result="result"
-          :opponentTyping="opponentTyping"
-          :message="message"
-          class="h-full"
-      />
+            :task="task"
+            :answers="answers"
+            :winner="winner"
+            :users="users"
+            :status="status"
+            :result="result"
+            :opponentTyping="opponentTyping"
+            :message="message"
+            class="h-full"
+        />
 
-      <template #footer>
-        <div class="flex items-center justify-between bg-white">
-          <AppButton
-              v-if="status === WebSocketStatus.DISCONNECTED"
-              @click="findGame"
-              icon="i-heroicons-magnifying-glass"
-          >
-            Find game
-          </AppButton>
-
-          <GameRoundTaskControl class="w-full" v-if="status === WsAnswers.GAME_START"/>
-        </div>
-      </template>
-    </UCard>
+        <template #footer>
+          <div class="flex items-center justify-between bg-white">
+            <GameRoundTaskControl class="w-full" v-if="status === WsAnswers.GAME_START"/>
+          </div>
+        </template>
+      </UCard>
+    </div>
   </div>
 </template>
 
