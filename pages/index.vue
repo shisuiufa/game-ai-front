@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AppButton from "~/components/ui/AppButton.vue";
 import {WebSocketStatus} from "~/constants/WebSocketStatus";
 import {WsAnswers} from "~/resource/game";
 import CountdownTimer from "~/components/ui/CountdownTimer.vue";
