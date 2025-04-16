@@ -36,7 +36,7 @@ const loserScore = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-2 sm:gap-4">
     <AiMessage v-if="winner && prompt">
       <p class="text-gray-700">
         🔍 This is what the image was based on: {{ prompt }}
@@ -54,8 +54,8 @@ const loserScore = computed(() =>
       </div>
 
       <template v-else>
-        <div class="flex items-center gap-1.5 text-gray-500 text-sm">
-          <div class="text-sm text-gray-600 animate-pulse">
+        <div class="flex items-center gap-1.5 text-gray-500">
+          <div class="text-gray-600 animate-pulse">
             Determining the winner...
           </div>
         </div>

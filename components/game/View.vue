@@ -29,7 +29,7 @@ const sortedAnswers = computed(() => {
 
 <template>
   <div class="h-full rounded-xl">
-    <div class="bg-black/5 min-h-full h-auto p-4 flex flex-col gap-4 text-base font-medium">
+    <div class="bg-black/5 min-h-full h-auto p-2 sm:p-4 flex flex-col gap-2 sm:gap-4 text-xs sm:text-base font-medium">
       <GameTaskAi v-if="task || (!task && status !== WsAnswers.GAME_ERROR)" :task="task" />
       <GameAnswerItem v-for="(item, idx) in sortedAnswers" :key="idx" :item="item"/>
       <GameOpponentTyping v-if="opponentTyping && opponent && !winner" :opponent="opponent"/>

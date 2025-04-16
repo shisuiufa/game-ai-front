@@ -26,6 +26,7 @@ const title = computed(() => {
       return "Waiting...";
   }
 });
+
 const icon = computed(() => {
   switch (status.value) {
     case WebSocketStatus.CONNECTED:
@@ -85,7 +86,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-full h-full p-4">
+  <div class="w-full h-full">
     <GameLobbyConnecting
         class="w-full h-full"
         v-if="showConnecting"
@@ -101,26 +102,33 @@ onMounted(() => {
              class="h-full flex flex-col shadow-lg rounded-2xl overflow-hidden"
              :ui="{
         body: {
-          base: 'flex flex-col grow overflow-y-auto p-6 bg-gray-50'
-        }
+          base: 'flex flex-col grow overflow-y-auto !py-0 !px-0 sm:py-0 sm:px-0 sm:p-0 bg-gray-50'
+        },
+        header: {
+          padding: '!px-3 !py-3 !sm:px-4 !sm:py-5'
+        },
+        footer: {
+          padding: '!px-3 !py-3 !sm:px-4 !sm:py-5'
+        },
       }"
       >
         <template #header>
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
-              <Icon :name="icon" class="w-5 h-5"/>
+            <div class="flex items-center gap-2 text-xs sm:text-lg font-semibold text-gray-800">
+              <Icon :name="icon" class="w-4 h-4 sm:w-5 sm:h-5"/>
               <span>{{ title }}</span>
             </div>
             <div class="flex gap-2">
               <CountdownTimer v-if="showCountdown" :endAt="endAt" :nowAt="nowAt"/>
-              <AppButton
+              <UButton
                   v-if="showExitButton"
+                  size="sm"
                   @click="$gameWs.leaveGame()"
                   icon="i-heroicons-arrow-left-on-rectangle"
                   color="red"
               >
                 Exit
-              </AppButton>
+              </UButton>
             </div>
           </div>
         </template>
@@ -145,11 +153,22 @@ onMounted(() => {
             class="h-full"
         />
 
-        <template #footer>
-          <div class="flex items-center justify-between bg-white">
-            <GameRoundTaskControl class="w-full" v-if="showTaskControl"/>
+        <Transition
+            appear
+            enter-active-class="transition-all duration-500 ease-out"
+            leave-active-class="transition-all duration-300 ease-in"
+            enter-from-class="-translate-y-6 opacity-0"
+            enter-to-class="translate-y-0 opacity-100"
+            leave-from-class="translate-y-0 opacity-100"
+            leave-to-class="-translate-y-4 opacity-0"
+        >
+          <div
+              v-if="showTaskControl"
+              class="flex items-center justify-between bg-white p-4 rounded shadow w-full"
+          >
+            <GameRoundTaskControl class="w-full" />
           </div>
-        </template>
+        </Transition>
       </UCard>
     </div>
   </div>

@@ -45,7 +45,7 @@ const formattedTime = computed(() => {
 </script>
 
 <template>
-  <div class="text-sm font-medium text-gray-600 flex items-center gap-1">
+  <div class="text-sm sm:text-lg font-medium text-gray-600 flex items-center gap-1">
     <Icon name="i-heroicons-clock" class="w-4 h-4 text-gray-500" />
     <span>{{ formattedTime }}</span>
   </div>

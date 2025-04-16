@@ -15,12 +15,12 @@ const retryGame = () => {
 
 <template>
   <AiMessage>
-    <p class="text-sm text-red-600 leading-relaxed">
+    <p class="text-red-600 leading-relaxed">
       {{ message }} 😢
     </p>
     <UButton
         @click="retryGame"
-        class="mt-3 py-1.5 text-center"
+        class="mt-1 sm:mt-3 py-1.5 text-center"
     >
       <p class="w-full">
         Try again 🔍

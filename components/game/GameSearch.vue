@@ -25,7 +25,7 @@ const items = computed(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 p-2 sm:p-4">
     <GameSearchItem v-for="(item, idx) in items" :key="idx" :item="item" />
   </div>
 </template>

@@ -43,7 +43,7 @@ const onInput = () => {
 </script>
 
 <template>
-  <UForm ref="form" :schema="schema" :state="state" class="flex items-center gap-2 h-10" @submit="submitAnswer">
+  <UForm ref="form" :schema="schema" :state="state" class="flex items-center gap-2 sm:h-10" @submit="submitAnswer">
     <UiAppInput :disabled="haveAnswer" v-model="state.answer" type="text" placeholder="Type a answer..." class="w-full h-full" @input="onInput"/>
     <UiAppButton icon="i-heroicons-paper-airplane" :disabled="!isValidSchema" type="submit" class="h-full" />
   </UForm >

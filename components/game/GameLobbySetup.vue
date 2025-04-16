@@ -28,7 +28,7 @@ onMounted(() => profileStore.fetchProfile())
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center text-center p-8 bg-white rounded-2xl shadow-2xl space-y-6 border border-gray-100 w-full mx-auto">
+  <div class="flex flex-col items-center justify-center text-center p-3 sm:p-8 bg-white rounded-2xl shadow-2xl space-y-6 border border-gray-100 w-full mx-auto">
     <!-- Заголовок -->
     <h2 class="text-3xl font-extrabold text-gray-900">Ready to play?</h2>
     <p class="text-gray-500 text-sm">Choose your stake and find a game</p>
@@ -41,13 +41,13 @@ onMounted(() => profileStore.fetchProfile())
     </div>
 
     <!-- 🎯 Ставки -->
-    <div class="flex gap-4 mt-2">
+    <div class="flex items-center justify-center gap-2 sm:gap-4 w-full">
       <button
           v-for="amount in bets"
           :key="amount.id"
           @click="selectedBet = amount"
           :disabled="amount.disabled"
-          class="flex items-center gap-2 px-6 py-3 rounded-full transition-all font-semibold text-sm border"
+          class="flex flex-1 sm:flex-none items-center justify-center gap-2 px-1 sm:px-6 py-2 sm:py-3 rounded-full transition-all font-semibold text-xs sm:text-sm border"
           :class="[
           amount.disabled
             ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
@@ -65,8 +65,7 @@ onMounted(() => profileStore.fetchProfile())
     <UButton
         @click="$emit('start', selectedBet)"
         icon="i-heroicons-play"
-        size="lg"
-        class="mt-4 px-8 py-3 font-bold text-white text-base bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full hover:from-indigo-600 hover:to-violet-600 transition-all shadow-lg"
+        class="px-4 py-2 sm:px-8 sm:py-3 font-bold text-white text-sm sm:text-base bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full hover:from-indigo-600 hover:to-violet-600 transition-all shadow-lg"
     >
       Start Game
     </UButton>
