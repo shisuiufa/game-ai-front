@@ -38,31 +38,31 @@ const loserScore = computed(() =>
 <template>
   <div class="flex flex-col gap-2 sm:gap-4">
     <AiMessage v-if="winner && prompt">
-      <p class="text-gray-700">
+      <p class="text-gray-700 text-xs sm:text-base">
         🔍 This is what the image was based on: {{ prompt }}
       </p>
     </AiMessage>
     <AiMessage>
       <div v-if="winner" class="flex flex-col max-w-96 bg-white rounded-lg gap-2">
-        <p class="text-gray-700">
+        <p class="text-gray-700 text-xs sm:text-base">
           🏆 The winner is {{ winner.username }}
         </p>
 
-        <p v-if="sortedResult" class="text-gray-700">
+        <p v-if="sortedResult" class="text-gray-700 text-xs sm:text-base">
           {{winnerScore ?? 0}}% vs {{loserScore ?? 0}}%.
         </p>
       </div>
 
       <template v-else>
         <div class="flex items-center gap-1.5 text-gray-500">
-          <div class="text-gray-600 animate-pulse">
+          <div class="text-gray-600 animate-pulse text-xs sm:text-base">
             Determining the winner...
           </div>
         </div>
       </template>
     </AiMessage>
     <AiMessage v-if="winner">
-      <p class="text-gray-700">
+      <p class="text-gray-700 text-xs sm:text-base">
         💰 The prize of 100 rub goes to {{ winner.username }}
       </p>
     </AiMessage>

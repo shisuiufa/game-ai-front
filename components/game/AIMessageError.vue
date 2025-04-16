@@ -15,7 +15,7 @@ const retryGame = () => {
 
 <template>
   <AiMessage>
-    <p class="text-red-600 leading-relaxed">
+    <p class="text-red-600 leading-relaxed text-xs sm:text-base">
       {{ message }} 😢
     </p>
     <UButton

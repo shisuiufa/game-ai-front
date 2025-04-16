@@ -32,7 +32,7 @@ setTimeout(() => {
       <div v-if="show" class="flex items-start gap-2">
         <div :class="['flex-inline p-2 sm:p-3 rounded-lg gap-3 shadow transition-colors duration-300',isUserAnswer ? 'bg-indigo-500 text-white' : 'bg-white text-gray-800 order-last']">
           <div v-if="item?.hidden" :key="'hidden-' + item.userId"
-               class="flex items-center gap-2 text:xs sm:text-sm italic text-gray-500">
+               class="flex items-center gap-2 text-xs sm:text-base italic text-gray-500">
             <Icon name="i-heroicons-lock-closed" class="w-4 h-4 text-gray-400"/>
             Answer hidden until round ends
           </div>

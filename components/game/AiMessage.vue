@@ -1,4 +1,10 @@
 <script setup lang="ts">
+defineProps({
+  padding: {
+    default: 'p-2 sm:p-3'
+  }
+})
+
 const show = ref(false);
 
 setTimeout(() => {
@@ -23,7 +29,7 @@ setTimeout(() => {
           🤖
         </div>
 
-        <div class="flex flex-col max-w-full sm:max-w-96 bg-white rounded-lg p-2 sm:p-3 justify-center">
+        <div :class="padding" class="flex flex-col max-w-full sm:max-w-96 bg-white rounded-lg justify-center rounded overflow-hidden">
           <slot />
         </div>
       </div>
