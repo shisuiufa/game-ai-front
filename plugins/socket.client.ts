@@ -4,8 +4,11 @@ import {WsAnswers} from "~/resource/game";
 import type {Ref} from "vue";
 import type {ResultResource} from "~/resource/result";
 import {useWsPath} from "~/config/entrypoint";
+import {useNotifications} from "~/composables/useNotifications";
 
 export default defineNuxtPlugin(() => {
+    const {notifyError} = useNotifications();
+
     let socket: WebSocket | null = null;
     let reconnectTimeout: NodeJS.Timeout | null = null;
     let shouldReconnect = true;
@@ -158,6 +161,14 @@ export default defineNuxtPlugin(() => {
                     socket?.close()
                 }
 
+                if(data.status === WsAnswers.GAME_ANSWER_ACCEPTED && data.answer) {
+                    wsAnswers.value.push({userId: user.value.id, answer: data.answer.answer})
+                }
+
+                if(data.status === WsAnswers.GAME_ANSWER_REJECTED && data.message) {
+                    notifyError({description: data.message});
+                }
+
                 if (data.endAt) {
                     wsEndAt.value = data.endAt;
                 }
@@ -257,8 +268,6 @@ export default defineNuxtPlugin(() => {
                         if (wsAnswers.value.find((item) => item.userId == user.value.id)) {
                             return;
                         }
-
-                        wsAnswers.value.push({userId: user.value.id, answer: answer})
                         socket.send(JSON.stringify({type: "answer", lobbyUuid: lobbyUuid.value, answer}));
                     } else {
                         console.warn("⚠️ WebSocket не подключен, ответ не отправлен");

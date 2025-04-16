@@ -68,5 +68,4 @@ const loserScore = computed(() =>
       </p>
     </AiMessage>
   </div>
-
 </template>
