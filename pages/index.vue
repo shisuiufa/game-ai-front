@@ -79,7 +79,7 @@ const showCountdown = computed(() =>
 );
 
 onMounted(() => {
-  $gameWs.restoreLobby();
+  $gameWs.connect();
   isInitializing.value = false;
 });
 </script>

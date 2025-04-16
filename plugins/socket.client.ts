@@ -1,7 +1,7 @@
 import {WebSocketStatus} from "~/constants/WebSocketStatus";
 import type {AnswerResource, TaskResource} from "~/resource/game";
-import type {Ref} from "vue";
 import {WsAnswers} from "~/resource/game";
+import type {Ref} from "vue";
 import type {ResultResource} from "~/resource/result";
 import {useWsPath} from "~/config/entrypoint";
 
@@ -10,7 +10,6 @@ export default defineNuxtPlugin(() => {
     let reconnectTimeout: NodeJS.Timeout | null = null;
     let shouldReconnect = true;
     let eventListeners: ((data: any) => void)[] = [];
-    let isConnecting = false;
 
     const opponentTyping = ref(false);
 
@@ -39,6 +38,19 @@ export default defineNuxtPlugin(() => {
         WsAnswers.GAME_USER_JOINED,
     ])
 
+    let heartbeatInterval: NodeJS.Timeout | null = null;
+
+    const startHeartbeat = () => {
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
+
+        heartbeatInterval = setInterval(() => {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                console.warn("💓 Heartbeat: сокет мёртв, перезапуск...");
+                connect();
+            }
+        }, 5000);
+    };
+
     const clearWs = () => {
         lobbyUuid.value = null;
         wsUsers.value = [];
@@ -64,6 +76,8 @@ export default defineNuxtPlugin(() => {
         } else {
             shouldReconnect = false;
 
+            wsStatus.value = WebSocketStatus.DISCONNECTED;
+
             const onceReady = () => {
                 socket?.removeEventListener("open", onceReady);
                 socket?.send(JSON.stringify({type: "findGame"}));
@@ -76,46 +90,35 @@ export default defineNuxtPlugin(() => {
     }
     const ensureConnectedAndFindGame = () => {
         if (wsStatus.value === WebSocketStatus.DISCONNECTED) {
-            if (isConnecting) return;
-            isConnecting = true;
-
             connect();
 
             const interval = setInterval(() => {
                 if (wsStatus.value === WebSocketStatus.CONNECTED) {
                     clearInterval(interval);
-                    isConnecting = false;
                     findGame();
                 }
             }, 100);
         } else {
-            isConnecting = false;
             findGame();
         }
     }
 
-    const restoreLobby = async () => {
-        await connect();
-
-        const interval = setInterval(() => {
-            if (wsStatus.value === WebSocketStatus.CONNECTED) {
-                clearInterval(interval);
-
-                socket?.send(JSON.stringify({
-                    type: 'reconnectToLobby',
-                }));
-            }
-        }, 100);
-    }
-
     const connect = () => {
+        if (wsStatus.value === WebSocketStatus.CONNECTED || wsStatus.value === WebSocketStatus.CONNECTING) {
+            return;
+        }
+
         console.log("🔌 Подключение к WebSocket...");
+
+        wsStatus.value = WebSocketStatus.CONNECTING;
+
         const {token, clear: clearToken} = useToken();
 
         const wsUrl = `${useWsPath()}?token=${encodeURIComponent(token.value || "")}`;
 
-        wsStatus.value = WebSocketStatus.CONNECTING;
         socket = new WebSocket(wsUrl);
+
+        startHeartbeat();
 
         socket.onopen = () => {
             console.log("✅ WebSocket подключен");
@@ -125,7 +128,13 @@ export default defineNuxtPlugin(() => {
         socket.onmessage = async (event) => {
             try {
                 const data = JSON.parse(event.data);
+
                 console.log("📩 Game WebSocket сообщение:", data);
+
+                if (data.status === WsAnswers.WS_READY) {
+                    socket.send(JSON.stringify({ type: 'reconnectToLobby' }));
+                    return;
+                }
 
                 if (data.code == 401 && data.refresh) {
                     await profileStore.refreshToken()
@@ -221,16 +230,19 @@ export default defineNuxtPlugin(() => {
         };
 
         socket.onclose = () => {
+            console.log('❌ WebSocket close')
             if (shouldReconnect) {
                 console.warn("⚠️ WebSocket отключен. Переподключение через 3 секунды...");
                 reconnectTimeout = setTimeout(connect, 3000);
             } else {
+                wsStatus.value = WebSocketStatus.DISCONNECTED;
                 clearWs()
             }
         };
 
         socket.onerror = (error) => {
             clearWs()
+            wsStatus.value = WebSocketStatus.DISCONNECTED;
             console.error("❌ Ошибка WebSocket:", error);
         };
     };
@@ -247,7 +259,7 @@ export default defineNuxtPlugin(() => {
                 },
                 findGame,
                 ensureConnectedAndFindGame,
-                restoreLobby,
+                connect,
                 sendAnswer: (answer: string) => {
                     if (socket?.readyState === WebSocket.OPEN) {
                         if (wsAnswers.value.find((item) => item.userId == user.value.id)) {
