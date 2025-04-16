@@ -39,7 +39,8 @@ const loserScore = computed(() =>
   <div class="flex flex-col gap-2 sm:gap-4">
     <AiMessage v-if="winner && prompt">
       <p class="text-gray-700 text-xs sm:text-base">
-        🔍 This is what the image was based on: {{ prompt }}
+        🔍 Original prompt: <br/>
+        <span class="italic">{{ prompt }}</span>
       </p>
     </AiMessage>
     <AiMessage>
