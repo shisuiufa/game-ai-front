@@ -23,6 +23,7 @@ export default defineNuxtPlugin(() => {
     const wsNowAt: number | null = ref(null)
     const wsResult: ResultResource[] | null = ref(null);
     const wsMessage: string | null = ref(null);
+    const wsPrompt: string | null = ref(null);
 
     const {user, clear} = useCurrentUser()
     const profileStore = useProfileStore();
@@ -37,19 +38,6 @@ export default defineNuxtPlugin(() => {
         WsAnswers.GAME_READY,
         WsAnswers.GAME_USER_JOINED,
     ])
-
-    let heartbeatInterval: NodeJS.Timeout | null = null;
-
-    const startHeartbeat = () => {
-        if (heartbeatInterval) clearInterval(heartbeatInterval);
-
-        heartbeatInterval = setInterval(() => {
-            if (!socket || socket.readyState !== WebSocket.OPEN) {
-                console.warn("💓 Heartbeat: сокет мёртв, перезапуск...");
-                connect();
-            }
-        }, 5000);
-    };
 
     const clearWs = () => {
         lobbyUuid.value = null;
@@ -83,14 +71,14 @@ export default defineNuxtPlugin(() => {
                 socket?.send(JSON.stringify({type: "findGame"}));
             };
 
-            connect();
+            connect(false);
             socket?.addEventListener("open", onceReady);
             console.warn("⚠️ WebSocket не подключен, поиск лобби невозможен");
         }
     }
     const ensureConnectedAndFindGame = () => {
         if (wsStatus.value === WebSocketStatus.DISCONNECTED) {
-            connect();
+            connect(false);
 
             const interval = setInterval(() => {
                 if (wsStatus.value === WebSocketStatus.CONNECTED) {
@@ -103,7 +91,7 @@ export default defineNuxtPlugin(() => {
         }
     }
 
-    const connect = () => {
+    const connect = (checkLobby = true) => {
         if (wsStatus.value === WebSocketStatus.CONNECTED || wsStatus.value === WebSocketStatus.CONNECTING) {
             return;
         }
@@ -118,8 +106,6 @@ export default defineNuxtPlugin(() => {
 
         socket = new WebSocket(wsUrl);
 
-        startHeartbeat();
-
         socket.onopen = () => {
             console.log("✅ WebSocket подключен");
             wsStatus.value = WebSocketStatus.CONNECTED;
@@ -131,7 +117,7 @@ export default defineNuxtPlugin(() => {
 
                 console.log("📩 Game WebSocket сообщение:", data);
 
-                if (data.status === WsAnswers.WS_READY) {
+                if (data.status === WsAnswers.WS_READY && checkLobby) {
                     socket.send(JSON.stringify({ type: 'reconnectToLobby' }));
                     return;
                 }
@@ -177,6 +163,10 @@ export default defineNuxtPlugin(() => {
 
                 if (data.endAt) {
                     wsEndAt.value = data.endAt;
+                }
+
+                if (data.prompt) {
+                    wsPrompt.value = data.prompt;
                 }
 
                 if (data.nowAt) {
@@ -292,6 +282,7 @@ export default defineNuxtPlugin(() => {
                 opponentTyping,
                 result: wsResult,
                 message: wsMessage,
+                prompt: wsPrompt
             }
         }
     };

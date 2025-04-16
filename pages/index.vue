@@ -6,7 +6,7 @@ import CountdownTimer from "~/components/ui/CountdownTimer.vue";
 
 const {$gameWs} = useNuxtApp();
 
-const {task, answers, winner, status, users, opponentTyping, endAt, nowAt, result, message} = toRefs($gameWs);
+const {task, answers, winner, status, users, opponentTyping, endAt, nowAt, result, message, prompt} = toRefs($gameWs);
 
 const findGame = () => {
   $gameWs.ensureConnectedAndFindGame();
@@ -52,7 +52,7 @@ const showSetup = computed(() =>
 );
 
 const showExitButton = computed(() =>
-    [WsAnswers.GAME_SEARCH, WsAnswers.GAME_START, WsAnswers.GAME_END].includes(status.value)
+    [WsAnswers.GAME_SEARCH, WsAnswers.GAME_END].includes(status.value)
 );
 
 const showGameSearch = computed(() =>
@@ -141,6 +141,7 @@ onMounted(() => {
             :result="result"
             :opponentTyping="opponentTyping"
             :message="message"
+            :prompt="prompt"
             class="h-full"
         />
 

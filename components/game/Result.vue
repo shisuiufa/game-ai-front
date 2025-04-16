@@ -6,6 +6,7 @@ import AiMessage from "~/components/game/AiMessage.vue";
 const props = defineProps<{
   winner?: WsUserResource | null,
   result?: ResultResource | null
+  prompt?: string | null
 }>();
 
 const show = ref(false);
@@ -36,6 +37,11 @@ const loserScore = computed(() =>
 
 <template>
   <div class="flex flex-col gap-4">
+    <AiMessage v-if="winner && prompt">
+      <p class="text-gray-700">
+        🔍 This is what the image was based on: {{ prompt }}
+      </p>
+    </AiMessage>
     <AiMessage>
       <div v-if="winner" class="flex flex-col max-w-96 bg-white rounded-lg gap-2">
         <p class="text-gray-700">

@@ -13,6 +13,7 @@ const props = defineProps<{
   status: number,
   result: ResultResource,
   message: string | null
+  prompt: string | null
 }>();
 
 const {user} = useCurrentUser();
@@ -35,6 +36,7 @@ const sortedAnswers = computed(() => {
       <GameResult v-if="status == WsAnswers.GAME_GENERATE_RESULT || status == WsAnswers.GAME_END"
                   :winner="winner"
                   :result="result"
+                  :prompt="prompt"
       />
       <AIMessageError v-if="status === WsAnswers.GAME_ERROR" :message="message"/>
     </div>
